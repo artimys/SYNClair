@@ -2,14 +2,12 @@ package com.sinclairdontcare.synclair;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -26,29 +24,28 @@ public class MainActivity extends AppCompatActivity {
     // Create object to hold default adapter
     // Required for any bluetooth activity
     BluetoothAdapter ba;
+
     // Define request codes
     private static final int REQUEST_ENABLE_BT = 0;
+
     // Define buttons and list
     Button btn_list, btn_open_player;
     ListView lv_content;
 
-    private BroadcastReceiver br;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         ba = BluetoothAdapter.getDefaultAdapter();
 
         // Check if device supports bluetooth
         if (ba == null) {
-            Toast.makeText(this, "No Bluetooth here, :-(", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No Bluetooth support here, :-(", Toast.LENGTH_LONG).show();
             finish();
         } else {
-            Toast.makeText(this, "You got bluetooth son, :-)", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "You have bluetooth support bro, :-)", Toast.LENGTH_LONG).show();
         }
 
 
@@ -101,31 +98,26 @@ public class MainActivity extends AppCompatActivity {
         btn_open_player.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // HA
+            PackageManager pm = getPackageManager(); //getApplicationContext().getPackageManager();
+            String packages = pm.getInstalledApplications(0).toString();
 
-                String packages;
-                PackageManager pm;
-                pm = getPackageManager(); //getApplicationContext().getPackageManager();
-                packages = pm.getInstalledApplications(0).toString();
+            TextView textView = findViewById(R.id.textView2);
+            textView.setMovementMethod(new ScrollingMovementMethod());
+            textView.setText(packages);
 
-                TextView textView = findViewById(R.id.textView2);
-                textView.setMovementMethod(new ScrollingMovementMethod());
-                textView.setText(packages);
-
-                // Open app by package name
-                Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.google.android.music");
-                startActivity(launchIntent);
-
+            // Open app by package name
+            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.google.android.youtube");
+            startActivity(launchIntent);
             }
         });
 
-
-    //    br = new MyBluetoothReceiver();
-    //    IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_ACL_CONNECTED);
-    //    filter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-    //    registerReceiver(br, filter);
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 
 
     public void go(View view) {
@@ -134,28 +126,5 @@ public class MainActivity extends AppCompatActivity {
         textView.setText(mds);
 
     }
-
-
-
-    class MyBluetoothReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            Intent launchIntent = getPackageManager().getLaunchIntentForPackage("com.google.android.music");
-            startActivity(launchIntent);
-            if(intent.getAction().equals("android.bluetooth.BluetoothDevice.ACTION_ACL_CONNECTED")){
-
-                // code for Bluetooth connect
-                // Open app by package name
-
-            }
-            if(intent.getAction().equals("android.bluetooth.device.action.ACL_DISCONNECTED")){
-
-                //code for Bluetooth disconnect;
-            }
-
-        }
-    }
-
 
 }
